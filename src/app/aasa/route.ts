@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 // Served at https://<your-domain>/.well-known/apple-app-site-association (no extension).
 // Apple fetches this to decide which URLs on this domain open the app directly.
 // Note: iOS requires this response to be served as application/json over HTTPS.
@@ -9,6 +8,16 @@ export async function GET() {
   const bundleId = process.env.IOS_BUNDLE_ID ?? "com.example.app";
   const appId = `${teamId}.${bundleId}`;
 
+  // Comma-separated list, e.g. "/l/*,NOT /l/_*,/promo/*"
+  const paths = (process.env.IOS_AASA_PATHS ?? "/l/*,NOT /l/_*")
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const components = paths
+    .filter((p) => !p.startsWith("NOT "))
+    .map((p) => ({ "/": p, comment: "Marketing deep links" }));
+
   const body = {
     applinks: {
       apps: [],
@@ -16,8 +25,8 @@ export async function GET() {
         {
           appID: appId,
           appIDs: [appId],
-          paths: ["/l/*", "NOT /l/_*"],
-          components: [{ "/": "/l/*", comment: "Marketing deep links" }],
+          paths,
+          components,
         },
       ],
     },
