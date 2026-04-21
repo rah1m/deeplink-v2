@@ -1,27 +1,32 @@
 import bcrypt from "bcryptjs";
-import { getDb } from "./db";
+import { ensureSchema, sql } from "./db";
 
-function main() {
+async function main() {
+  await ensureSchema();
+
   const email = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
   const password = process.env.SEED_ADMIN_PASSWORD ?? "changeme";
-  const db = getDb();
 
-  const existing = db
-    .prepare("SELECT id FROM users WHERE email = ?")
-    .get(email) as { id: number } | undefined;
-
-  if (existing) {
-    console.log(`User ${email} already exists (id=${existing.id}). Skipping.`);
+  const existing = (await sql`SELECT id FROM users WHERE email = ${email}`) as {
+    id: number;
+  }[];
+  if (existing.length > 0) {
+    console.log(`User ${email} already exists (id=${existing[0].id}). Skipping.`);
     return;
   }
 
   const hash = bcrypt.hashSync(password, 10);
-  const info = db
-    .prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)")
-    .run(email, hash, "Admin");
+  const rows = (await sql`
+    INSERT INTO users (email, password_hash, name)
+    VALUES (${email}, ${hash}, 'Admin')
+    RETURNING id
+  `) as { id: number }[];
 
-  console.log(`Seeded admin ${email} (id=${info.lastInsertRowid}).`);
+  console.log(`Seeded admin ${email} (id=${rows[0].id}).`);
   console.log(`Password: ${password}`);
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

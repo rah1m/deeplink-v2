@@ -10,11 +10,11 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
-  const user = verifyLogin(parsed.data.email, parsed.data.password);
+  const user = await verifyLogin(parsed.data.email, parsed.data.password);
   if (!user) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
-  const token = createSession(user.id);
+  const token = await createSession(user.id);
   setSessionCookie(token);
   return NextResponse.json({ ok: true, user });
 }

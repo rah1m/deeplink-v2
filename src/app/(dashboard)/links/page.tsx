@@ -9,8 +9,8 @@ function publicUrl(slug: string) {
   return `${base}/l/${slug}`;
 }
 
-export default function LinksPage() {
-  const links = listLinksWithMetrics();
+export default async function LinksPage() {
+  const links = await listLinksWithMetrics();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

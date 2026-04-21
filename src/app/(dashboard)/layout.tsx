@@ -3,12 +3,12 @@ import Link from "next/link";
 import { currentUser } from "@/lib/auth";
 import LogoutButton from "@/components/LogoutButton";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = currentUser();
+  const user = await currentUser();
   if (!user) redirect("/login");
 
   return (

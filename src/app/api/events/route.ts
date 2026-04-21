@@ -31,11 +31,11 @@ export async function POST(req: Request) {
 
   let linkId: number | null = null;
   if (parsed.data.cid) {
-    const byClick = findClickByCid(parsed.data.cid);
+    const byClick = await findClickByCid(parsed.data.cid);
     if (byClick) linkId = byClick.link_id;
   }
   if (!linkId && parsed.data.slug) {
-    const link = getLinkBySlug(parsed.data.slug);
+    const link = await getLinkBySlug(parsed.data.slug);
     if (link) linkId = link.id;
   }
   if (!linkId) {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     );
   }
 
-  recordEvent({
+  await recordEvent({
     linkId,
     kind: parsed.data.kind,
     cid: parsed.data.cid ?? null,

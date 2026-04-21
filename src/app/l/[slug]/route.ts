@@ -24,7 +24,7 @@ export async function GET(
   req: Request,
   { params }: { params: { slug: string } }
 ) {
-  const link = getLinkBySlug(params.slug);
+  const link = await getLinkBySlug(params.slug);
   if (!link) {
     return new NextResponse("Link not found", { status: 404 });
   }
@@ -42,7 +42,7 @@ export async function GET(
   const platform = detectPlatform(userAgent);
 
   const cid = nanoid(12);
-  recordEvent({
+  await recordEvent({
     linkId: link.id,
     kind: "click",
     cid,

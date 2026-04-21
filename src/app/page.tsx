@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 
-export default function Home() {
-  if (currentUser()) redirect("/links");
+export default async function Home() {
+  if (await currentUser()) redirect("/links");
   redirect("/login");
 }

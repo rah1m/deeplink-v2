@@ -16,13 +16,13 @@ const createSchema = z.object({
 });
 
 export async function GET() {
-  const user = currentUser();
+  const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ links: listLinksWithMetrics() });
+  return NextResponse.json({ links: await listLinksWithMetrics() });
 }
 
 export async function POST(req: Request) {
-  const user = currentUser();
+  const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => null);

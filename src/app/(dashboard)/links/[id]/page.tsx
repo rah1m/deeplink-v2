@@ -13,12 +13,12 @@ function publicUrl(slug: string) {
   return `${base}/l/${slug}`;
 }
 
-export default function LinkDetailPage({ params }: Params) {
+export default async function LinkDetailPage({ params }: Params) {
   const id = Number(params.id);
-  const link = getLinkById(id);
+  const link = await getLinkById(id);
   if (!link) notFound();
 
-  const metrics = getLinkMetrics(id);
+  const metrics = await getLinkMetrics(id);
   const url = link.short_url ?? publicUrl(link.slug);
   const expired = isExpired(link);
 
