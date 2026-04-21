@@ -7,10 +7,9 @@ const connectionString =
 
 if (!connectionString) {
   throw new Error(
-    "DATABASE_URL is not set. Add it to .env.local for local dev or to Vercel → Settings → Environment Variables."
+    "DATABASE_URL is not set. Add it to .env.local for local dev or to Vercel → Settings → Environment Variables.",
   );
 }
-
 export const sql = neon(connectionString);
 
 declare global {
