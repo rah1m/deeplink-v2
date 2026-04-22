@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { recordEvent } from "@/lib/events";
-import {
-  buildDestinationUrl,
-  getLinkBySlug,
-  isExpired,
-} from "@/lib/links";
+import { buildDestinationUrl, getLinkBySlug, isExpired } from "@/lib/links";
 import { detectPlatform } from "@/lib/ua";
 
 // How the redirect behaves per platform:
-//
 // iOS:     We return a 302 to the Universal Link (our own https URL pointing at the
 //          app's registered path). With a valid AASA file, iOS opens the app directly
 //          without the browser flashing. If the app isn't installed, we fall through
@@ -22,7 +17,7 @@ import { detectPlatform } from "@/lib/ua";
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string } },
 ) {
   const link = await getLinkBySlug(params.slug);
   if (!link) {
@@ -73,15 +68,20 @@ export async function GET(
   return NextResponse.redirect(destinationUrl, { status: 302 });
 }
 
-function androidIntentHtml(slug: string, httpsUrl: string, cid: string): string {
-  const pkg = process.env.ANDROID_STORE_PACKAGE ?? process.env.ANDROID_PACKAGE_NAME ?? "";
+function androidIntentHtml(
+  slug: string,
+  httpsUrl: string,
+  cid: string,
+): string {
+  const pkg =
+    process.env.ANDROID_STORE_PACKAGE ?? process.env.ANDROID_PACKAGE_NAME ?? "";
   const parsed = new URL(httpsUrl);
   const intentUrl =
     `intent://${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}` +
     `#Intent;scheme=https;package=${pkg};` +
     `S.browser_fallback_url=${encodeURIComponent(
       `https://play.google.com/store/apps/details?id=${pkg}` +
-        `&referrer=${encodeURIComponent(`cid=${cid}&slug=${slug}`)}`
+        `&referrer=${encodeURIComponent(`cid=${cid}&slug=${slug}`)}`,
     )};end`;
 
   return `<!doctype html>
